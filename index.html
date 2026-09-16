@@ -1,164 +1,170 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0b1020">
-  <title>Talha Habib | Portfolio</title>
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talha Habib — Full-Stack Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <input type="checkbox" id="bar-box">
-  <label for="bar-box" class="menu-button"><i class='bx bx-menu'></i></label>
-
-  <header class="site-header">
-    <div class="brand">Talha Habib</div>
-    <nav>
-      <label for="bar-box" class="close-button"><i class='bx bxs-x-square'></i></label>
-      <a href="#home">Home</a>
-      <a href="#skillBox">Skills</a>
-      <a href="#below-is-project">Projects</a>
-      <a href="#about">About</a>
-      <a href="#below-review">Reviews</a>
-      <a href="#personal">Details</a>
-    </nav>
-  </header>
-
-  <main>
-    <section id="home" class="hero-section">
-      <div class="hero-copy">
-        <span class="tagline">Student • Developer • Learner</span>
-        <h1>Talha Habib</h1>
-        <h2>Fullstack Developer</h2>
-        <p>I am a student of Government Degree College Chitral and currently pursuing a Bachelor's in Computer Sciences in my 2nd semester.</p>
-        <div class="hero-actions">
-          <a href="#below-is-project" class="btn btn-primary">View Projects</a>
-          <a href="#about" class="btn btn-secondary">About Me</a>
+ 
+<div class="page">
+ 
+  <!-- ============ LEFT COLUMN ============ -->
+  <div class="col col--left">
+ 
+    <!-- HERO PANEL -->
+    <section class="panel panel--hero" id="home">
+      <nav class="nav">
+        <a href="#home" class="nav__logo">Talha<span>.</span></a>
+        <div class="nav__links">
+          <a href="#home" class="is-active">Home</a>
+          <a href="#about">About</a>
+          <a href="#services">Services</a>
+          <a href="#work">Projects</a>
+          <a href="#contact">Contact</a>
         </div>
-        <div class="mini-stats">
-          <div>
-            <strong>6+</strong>
-            <span>Portfolio Projects</span>
+      </nav>
+ 
+      <div class="hero">
+        <div class="hero__text">
+          <p class="hero__hi">Hello, It's Me</p>
+          <h1 class="hero__name">Talha Habib</h1>
+          <p class="hero__role">And I'm a <span>Full-Stack Developer</span></p>
+          <p class="hero__desc">MERN &amp; Laravel developer building toward a career in AI, based in Chitral, Pakistan. I turn ideas into working products, end to end.</p>
+ 
+          <div class="social-row">
+            <a href="https://github.com/TalhaHabib-hub" target="_blank" rel="noopener" aria-label="GitHub"><i class='bx bxl-github'></i></a>
+            <a href="https://www.linkedin.com/in/talha-habib-411405410/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class='bx bxl-linkedin-square'></i></a>
+            <a href="https://www.facebook.com/talha.habib.844453" target="_blank" rel="noopener" aria-label="Facebook"><i class='bx bxl-facebook-circle'></i></a>
+            <a href="https://wa.me/923480157976" target="_blank" rel="noopener" aria-label="WhatsApp"><i class='bx bxl-whatsapp'></i></a>
           </div>
-          <div>
-            <strong>3</strong>
-            <span>Core Tech Areas</span>
+ 
+          <a href="#contact" class="btn-pill">Let's Talk</a>
+        </div>
+ 
+        <div class="hero__hex-wrap">
+          <div class="hex hex--glow">
+            <div class="hex__inner">
+              <img src="t1.png" alt="Talha Habib">
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="image-holder">
-        <img src="t1.png" alt="Talha Habib portrait">
+    </section>
+ 
+    <!-- ABOUT PANEL -->
+    <section class="panel panel--about" id="about">
+      <div class="hex hex--outline">
+        <div class="hex__inner">
+          <img src="t1.png" alt="Talha Habib">
+        </div>
+      </div>
+ 
+      <div class="about__text">
+        <h2>About <span>Me</span></h2>
+        <p class="about__role">Full-Stack Developer</p>
+        <p>I'm a Computer Science student working across the MERN stack and Laravel. I was previously an intern at HindukushSoft Technologies, building CRUD apps and REST APIs — and I'm now building toward a career in AI, most recently on a Gemini-powered student assistant platform.</p>
+        <a href="#work" class="btn-pill btn-pill--outline">Read More</a>
       </div>
     </section>
-
-    <section class="skillBox" id="skillBox">
-      <h2 id="skills">My Skills</h2>
-      <div class="skills-grid">
-        <details open>
-          <summary>C++</summary>
-          <p>Strong understanding of programming basics like loops, functions, and object-oriented programming concepts such as polymorphism.</p>
-        </details>
-        <details>
-          <summary>Python</summary>
-          <p>I have developed a solid foundation in Python through self-learning, including loops, functions, OOP, and file handling.</p>
-        </details>
-        <details>
-          <summary>HTML</summary>
-          <p>My HTML knowledge has grown through practical web projects and internship work, especially in structuring responsive content.</p>
-        </details>
-        <details>
-          <summary>CSS</summary>
-          <p>I enjoy building cleaner interfaces with CSS, including responsive layouts, navigation bars, sidebars, and animated UI.</p>
-        </details>
-        <details>
-          <summary>JavaScript</summary>
-          <p>I am actively improving my JavaScript skills by working with functions, loops, DOM manipulation, JSON, and interactive features.</p>
-        </details>
-      </div>
-    </section>
-
-    <section>
-      <h2 id="below-is-project" class="section-title">Projects</h2>
-      <div class="Projects-section">
-        <div>
-          <h3>Amazon Clone</h3>
-          <p>A desktop-style Amazon UI clone created with HTML and CSS to practice layout design and page structure.</p>
-          <a href="https://github.com/TalhaHabib-hub/Amazon-UI-clone-for-Desktop-only">Amazon Clone</a>
+ 
+  </div>
+ 
+  <!-- ============ RIGHT COLUMN ============ -->
+  <div class="col col--right">
+ 
+    <!-- SERVICES -->
+    <section class="panel panel--services" id="services">
+      <h2 class="panel-title">Our <span>Services</span></h2>
+      <div class="services__grid">
+        <div class="service-card">
+          <i class='bx bx-code-alt'></i>
+          <h3>Frontend</h3>
+          <p>React &amp; MERN interfaces built to be fast, responsive and easy to use.</p>
         </div>
-        <div>
-          <h3>Profile Card UI</h3>
-          <p>A stylish profile card using HTML and CSS with avatar, follow buttons, and contact style elements.</p>
-          <a href="https://github.com/TalhaHabib-hub/Profile-card-UI">Profile Card</a>
+        <div class="service-card">
+          <i class='bx bx-server'></i>
+          <h3>Backend</h3>
+          <p>Laravel &amp; Node APIs — auth, databases, and clean REST endpoints.</p>
         </div>
-        <div>
-          <h3>Cricket Game</h3>
-          <p>A small interactive cricket game built with HTML, CSS, and JavaScript that uses game logic and user choice comparisons.</p>
-          <a href="https://github.com/TalhaHabib-hub/Web-Projects/tree/main/CricketGame">Cricket Game</a>
-        </div>
-        <div>
-          <h3>Question Answers</h3>
-          <p>A Python-based quiz program that asks questions, checks answers, and calculates scores using lists and loops.</p>
-          <a href="https://github.com/TalhaHabib-hub/Web-Projects/blob/main/QuestionsAnswer.py">Question Answers</a>
-        </div>
-        <div>
-          <h3>Sidebar Project</h3>
-          <p>A responsive HTML/CSS sidebar project made for a company profile card layout.</p>
-          <a href="https://github.com/TalhaHabib-hub/Web-Projects/tree/main/HTML%20%26%20CSS%20projects">Sidebar</a>
-        </div>
-        <div>
-          <h3>Calculator</h3>
-          <p>A functional calculator built with HTML, CSS, and JavaScript using logic-driven button interaction.</p>
-          <a href="https://github.com/TalhaHabib-hub/Web-Projects/tree/main/calculator">Calculator</a>
+        <div class="service-card">
+          <i class='bx bx-chip'></i>
+          <h3>AI Integration</h3>
+          <p>Gemini-powered features: quiz generation, chat, and content tools.</p>
         </div>
       </div>
     </section>
-
-    <section class="about" id="about">
-      <h2 id="about-heading">About Me</h2>
-      <p>My name is Talha Habib, son of Muhammad Habib Khan. I come from Lower Chitral and grew up in Jughoor Lasht. I completed my early education at Muslim Model School, later passed matriculation from FCPS Chitral, and completed my FSc at Government Degree College Chitral. I am now continuing my studies in Computer Sciences at the same college and actively improving my skills through practical projects and self-learning.</p>
-    </section>
-
-    <section>
-      <h2 id="below-review" class="section-title">Reviews</h2>
-      <div class="review">
-        <div>
-          <h3>Ahmad Ali</h3>
-          <p>Talha is a focused and hardworking student who actively participates in class and keeps improving his coding skills.</p>
-        </div>
-        <div>
-          <h3>Faizan Ilahi</h3>
-          <p>Talha has a strong learning mindset and his projects reflect consistent effort and growing confidence in development.</p>
-        </div>
-        <div>
-          <h3>Mudassir</h3>
-          <p>I have seen Talha work hard and stay committed to learning. He is improving quickly and applying his knowledge in creative ways.</p>
-        </div>
+ 
+    <!-- PROJECTS -->
+    <section class="panel panel--projects" id="work">
+      <h2 class="panel-title">Latest <span>Projects</span></h2>
+      <p class="panel-note">Placeholder thumbnails below — swap in real screenshots and links for each project.</p>
+      <div class="projects__grid">
+        <a href="#" class="project-tile" data-repo="ADD-YOUR-REPO-LINK-HERE">
+          <i class='bx bx-brain'></i>
+          <span>Student AI Assistant</span>
+        </a>
+        <a href="#" class="project-tile" data-repo="ADD-YOUR-REPO-LINK-HERE">
+          <i class='bx bx-task'></i>
+          <span>Laravel Task Manager</span>
+        </a>
+        <a href="https://github.com/TalhaHabib-hub" target="_blank" rel="noopener" class="project-tile">
+          <i class='bx bx-plus'></i>
+          <span>Add Project</span>
+        </a>
+        <a href="https://github.com/TalhaHabib-hub" target="_blank" rel="noopener" class="project-tile">
+          <i class='bx bx-plus'></i>
+          <span>Add Project</span>
+        </a>
       </div>
     </section>
-  </main>
-
-  <footer id="foot">
-    <div class="links">
-      <a href="https://www.facebook.com/talha.habib.844453"><i class='bx bxl-facebook-circle'></i></a>
-      <a href="https://wa.me.923480157976"><i class='bx bxl-whatsapp'></i></a>
-      <a href="https://www.instagram.com/talhahabib7758/?hl=en"><i class='bx bxl-instagram-alt'></i></a>
-      <a href="https://github.com/TalhaHabib-hub"><i class='bx bxl-github'></i></a>
-      <a href="tel:+923480157976"><i class='bx bx-phone'></i></a>
-    </div>
-
-    <div class="personal-details" id="personal">
-      <h4>Personal Details</h4>
-      <p>Talha Habib<br>
-      s/o Muhammad Habib Khan<br>
-      Software Engineer<br>
-      Full Stack Developer</p>
-    </div>
-  </footer>
-
-  <footer class="copyright-footer">
-    <h6>© 2026 Talha Habib. All rights reserved.</h6>
-  </footer>
+ 
+    <!-- CONTACT -->
+    <section class="panel panel--contact" id="contact">
+      <h2 class="panel-title">Contact <span>Me!</span></h2>
+      <form class="contact-form" id="contactForm">
+        <div class="form-row">
+          <input type="text" id="cf-name" placeholder="Full Name" required>
+          <input type="email" id="cf-email" placeholder="Email Address" required>
+        </div>
+        <div class="form-row">
+          <input type="tel" id="cf-phone" placeholder="Mobile Number">
+          <input type="text" id="cf-subject" placeholder="Email Subject">
+        </div>
+        <textarea id="cf-message" placeholder="Your Message" rows="4" required></textarea>
+        <button type="submit" class="btn-pill btn-pill--wide">Send Message</button>
+      </form>
+    </section>
+ 
+  </div>
+</div>
+ 
+<footer class="footer">
+  <p>© <span id="year"></span> Talha Habib will work in AI.</p>
+</footer>
+ 
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+ 
+  // Static page, no backend — opens the visitor's email client with the message pre-filled.
+  document.getElementById('contactForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const name = document.getElementById('cf-name').value;
+    const email = document.getElementById('cf-email').value;
+    const phone = document.getElementById('cf-phone').value;
+    const subject = document.getElementById('cf-subject').value || 'Portfolio contact';
+    const message = document.getElementById('cf-message').value;
+    const body = `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\n\n${message}`;
+    window.location.href = `mailto:talhahabib8426@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+</script>
+ 
 </body>
 </html>
+ 
