@@ -1,5 +1,4 @@
 
-
 :root {
   --bg:        #10141C;
   --panel-a:   #1B212C;
@@ -55,6 +54,26 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; 
 }
 .col { display: flex; flex-direction: column; gap: 1.75rem; }
  
+.panel--languages { grid-column: 1 / -1; text-align: center; }
+.lang__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+.lang-card {
+  background: var(--panel-b);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  transition: transform 0.15s ease;
+}
+.lang-card:hover { transform: translateY(-3px); }
+.lang-card i { font-size: 2.1rem; }
+.lang-card span { font-size: 0.8rem; color: var(--text-muted); }
+ 
 .panel {
   background: var(--panel-a);
   border-radius: var(--radius-lg);
@@ -76,9 +95,7 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; 
   margin-bottom: 1.5rem;
 }
  
-/* ============================================
-   NAV
-   ============================================ */
+
 .nav {
   display: flex;
   align-items: center;
@@ -283,6 +300,7 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; 
   .page { grid-template-columns: 1fr; }
   .panel--about { flex-direction: column; text-align: center; }
   .about__text p:not(.about__role) { margin-left: auto; margin-right: auto; }
+  .lang__grid { grid-template-columns: repeat(3, 1fr); }
 }
  
 @media (max-width: 640px) {
@@ -292,5 +310,6 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; 
   .hero { flex-direction: column-reverse; }
   .services__grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
+  .lang__grid { grid-template-columns: repeat(3, 1fr); }
 }
  
