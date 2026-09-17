@@ -1,4 +1,6 @@
 
+
+Index · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -104,41 +106,66 @@
     <!-- PROJECTS -->
     <section class="panel panel--projects" id="work">
       <h2 class="panel-title">Latest <span>Projects</span></h2>
-      <p class="panel-note">Placeholder thumbnails below — swap in real screenshots and links for each project.</p>
       <div class="projects__grid">
-        <a href="#" class="project-tile" data-repo="ADD-YOUR-REPO-LINK-HERE">
+        <a href="https://github.com/TalhaHabib-hub/student_ai_platform" target="_blank" rel="noopener" class="project-tile">
           <i class='bx bx-brain'></i>
-          <span>Student AI Assistant</span>
+          <span class="project-tile__name">Student AI Assistant Platform</span>
+          <span class="project-tile__desc">One-platform AI study tool — quiz generation, exam prep &amp; feedback</span>
         </a>
-        <a href="#" class="project-tile" data-repo="ADD-YOUR-REPO-LINK-HERE">
-          <i class='bx bx-task'></i>
-          <span>Laravel Task Manager</span>
+        <a href="https://github.com/TalhaHabib-hub/Tasks-during-Internship-at-HindukushSoft" target="_blank" rel="noopener" class="project-tile">
+          <i class='bx bx-briefcase'></i>
+          <span class="project-tile__name">HindukushSoft Internship Tasks</span>
+          <span class="project-tile__desc">CRUD apps &amp; API tasks built over a 2-month internship</span>
         </a>
-        <a href="https://github.com/TalhaHabib-hub" target="_blank" rel="noopener" class="project-tile">
-          <i class='bx bx-plus'></i>
-          <span>Add Project</span>
+        <a href="https://github.com/TalhaHabib-hub/OnlineEducationWebsite" target="_blank" rel="noopener" class="project-tile">
+          <i class='bx bx-book-open'></i>
+          <span class="project-tile__name">Online Education Website</span>
+          <span class="project-tile__desc">A full education-platform site build</span>
         </a>
-        <a href="https://github.com/TalhaHabib-hub" target="_blank" rel="noopener" class="project-tile">
-          <i class='bx bx-plus'></i>
-          <span>Add Project</span>
+        <a href="https://github.com/TalhaHabib-hub/Amazon-UI-clone-for-Desktop-only" target="_blank" rel="noopener" class="project-tile">
+          <i class='bx bx-cart-alt'></i>
+          <span class="project-tile__name">Amazon UI Clone</span>
+          <span class="project-tile__desc">Pixel-matched Amazon desktop interface</span>
+        </a>
+        <a href="https://github.com/TalhaHabib-hub/50-Projects-Html-CSS-and-JS." target="_blank" rel="noopener" class="project-tile">
+          <i class='bx bx-code-block'></i>
+          <span class="project-tile__name">50 Projects in HTML, CSS &amp; JS</span>
+          <span class="project-tile__desc">A growing set of small front-end builds</span>
+        </a>
+        <a href="https://github.com/TalhaHabib-hub/Web-Projects" target="_blank" rel="noopener" class="project-tile">
+          <i class='bx bx-globe'></i>
+          <span class="project-tile__name">Web Projects</span>
+          <span class="project-tile__desc">Collection of standalone web builds</span>
+        </a>
+        <a href="https://github.com/TalhaHabib-hub/Profile-card-UI" target="_blank" rel="noopener" class="project-tile">
+          <i class='bx bx-id-card'></i>
+          <span class="project-tile__name">Profile Card UI</span>
+          <span class="project-tile__desc">An HTML &amp; CSS profile card component</span>
+        </a>
+        <a href="https://github.com/TalhaHabib-hub/Side-bar-using-html-and-CSS" target="_blank" rel="noopener" class="project-tile">
+          <i class='bx bx-dock-left'></i>
+          <span class="project-tile__name">Transparent Sidebar UI</span>
+          <span class="project-tile__desc">A glass-style sidebar built in HTML &amp; CSS</span>
         </a>
       </div>
+      <a href="https://github.com/TalhaHabib-hub?tab=repositories" target="_blank" rel="noopener" class="projects__more">See all repositories <i class='bx bx-link-external'></i></a>
     </section>
  
     <!-- CONTACT -->
     <section class="panel panel--contact" id="contact">
       <h2 class="panel-title">Contact <span>Me!</span></h2>
-      <form class="contact-form" id="contactForm">
+      <form class="contact-form" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
         <div class="form-row">
-          <input type="text" id="cf-name" placeholder="Full Name" required>
-          <input type="email" id="cf-email" placeholder="Email Address" required>
+          <input type="text" name="name" id="cf-name" placeholder="Full Name" required>
+          <input type="email" name="email" id="cf-email" placeholder="Email Address" required>
         </div>
         <div class="form-row">
-          <input type="tel" id="cf-phone" placeholder="Mobile Number">
-          <input type="text" id="cf-subject" placeholder="Email Subject">
+          <input type="tel" name="phone" id="cf-phone" placeholder="Mobile Number">
+          <input type="text" name="subject" id="cf-subject" placeholder="Email Subject">
         </div>
-        <textarea id="cf-message" placeholder="Your Message" rows="4" required></textarea>
-        <button type="submit" class="btn-pill btn-pill--wide">Send Message</button>
+        <textarea name="message" id="cf-message" placeholder="Your Message" rows="4" required></textarea>
+        <button type="submit" class="btn-pill btn-pill--wide" id="cf-submit">Send Message</button>
+        <p class="cf-status" id="cf-status" role="status"></p>
       </form>
     </section>
  
@@ -152,16 +179,41 @@
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
  
-  // Static page, no backend — opens the visitor's email client with the message pre-filled.
-  document.getElementById('contactForm').addEventListener('submit', function (e) {
+  // Sends the form in the background via Formspree (no page reload, no backend to host).
+  // Setup needed once: create a free form at https://formspree.io using
+  // talhahabib8426@gmail.com, then replace YOUR_FORM_ID in the <form action="..."> above
+  // with the ID Formspree gives you.
+  const form = document.getElementById('contactForm');
+  const status = document.getElementById('cf-status');
+  const submitBtn = document.getElementById('cf-submit');
+ 
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
-    const name = document.getElementById('cf-name').value;
-    const email = document.getElementById('cf-email').value;
-    const phone = document.getElementById('cf-phone').value;
-    const subject = document.getElementById('cf-subject').value || 'Portfolio contact';
-    const message = document.getElementById('cf-message').value;
-    const body = `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\n\n${message}`;
-    window.location.href = `mailto:talhahabib8426@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    status.textContent = '';
+    status.className = 'cf-status';
+ 
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (response.ok) {
+        status.textContent = "Message sent — I'll get back to you soon.";
+        status.classList.add('cf-status--ok');
+        form.reset();
+      } else {
+        throw new Error('Send failed');
+      }
+    } catch (err) {
+      status.textContent = "Couldn't send — email me directly at talhahabib8426@gmail.com";
+      status.classList.add('cf-status--err');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Message';
+    }
   });
 </script>
  
