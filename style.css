@@ -1,4 +1,5 @@
 
+
 :root {
   --bg:        #10141C;
   --panel-a:   #1B212C;
@@ -57,7 +58,7 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; 
 .panel--languages { grid-column: 1 / -1; text-align: center; }
 .lang__grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
   gap: 1rem;
 }
 .lang-card {
@@ -72,6 +73,7 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; 
 }
 .lang-card:hover { transform: translateY(-3px); }
 .lang-card i { font-size: 2.1rem; }
+.lang-card .accent-icon { color: var(--accent); }
 .lang-card span { font-size: 0.8rem; color: var(--text-muted); }
  
 .panel {
@@ -95,7 +97,9 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; 
   margin-bottom: 1.5rem;
 }
  
-
+/* ============================================
+   NAV
+   ============================================ */
 .nav {
   display: flex;
   align-items: center;
@@ -300,7 +304,6 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; 
   .page { grid-template-columns: 1fr; }
   .panel--about { flex-direction: column; text-align: center; }
   .about__text p:not(.about__role) { margin-left: auto; margin-right: auto; }
-  .lang__grid { grid-template-columns: repeat(3, 1fr); }
 }
  
 @media (max-width: 640px) {
@@ -310,6 +313,5 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; 
   .hero { flex-direction: column-reverse; }
   .services__grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
-  .lang__grid { grid-template-columns: repeat(3, 1fr); }
 }
  
