@@ -1,30 +1,61 @@
 
 document.getElementById('year').textContent = new Date().getFullYear();
  
-// ===== Ambient background particles =====
-// Soft glowing dots drifting upward behind everything — purely decorative,
-// skipped entirely if the visitor's system prefers reduced motion.
+// ===== Ambient background: starlight headliner effect =====
+// A field of fixed, independently twinkling points (like a Rolls-Royce
+// starlight roof) plus the occasional shooting star streaking across.
+// Purely decorative — skipped entirely if the visitor prefers reduced motion.
 (function () {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduceMotion) return;
  
   const field = document.getElementById('bg-fx');
-  const count = window.innerWidth < 640 ? 22 : 42;
-  const palette = ['var(--accent)', '#8FF3EC', '#5AC8C0'];
+  const isSmall = window.innerWidth < 640;
+  const starCount = isSmall ? 70 : 150;
  
-  for (let i = 0; i < count; i++) {
-    const p = document.createElement('span');
-    p.className = 'fx-particle';
-    const size = (Math.random() * 3 + 1.5).toFixed(1);
-    p.style.left = (Math.random() * 100) + 'vw';
-    p.style.width = size + 'px';
-    p.style.height = size + 'px';
-    p.style.background = palette[Math.floor(Math.random() * palette.length)];
-    p.style.setProperty('--o', (0.25 + Math.random() * 0.45).toFixed(2));
-    p.style.animationDuration = (10 + Math.random() * 14) + 's';
-    p.style.animationDelay = (-Math.random() * 20) + 's';
-    field.appendChild(p);
+  for (let i = 0; i < starCount; i++) {
+    const s = document.createElement('span');
+    s.className = 'fx-star';
+    const big = Math.random() < 0.08; // a handful of brighter "signature" stars
+    const size = big ? (2 + Math.random() * 1.4) : (0.8 + Math.random() * 1.4);
+    s.style.top = (Math.random() * 100) + 'vh';
+    s.style.left = (Math.random() * 100) + 'vw';
+    s.style.width = size.toFixed(1) + 'px';
+    s.style.height = size.toFixed(1) + 'px';
+    s.style.setProperty('--min-o', big ? '0.35' : (0.1 + Math.random() * 0.15).toFixed(2));
+    s.style.setProperty('--max-o', big ? '1' : (0.55 + Math.random() * 0.35).toFixed(2));
+    s.style.animationDuration = (2.2 + Math.random() * 4.5).toFixed(2) + 's';
+    s.style.animationDelay = (-Math.random() * 8).toFixed(2) + 's';
+    if (big) s.style.boxShadow = '0 0 4px 1px rgba(143,243,236,0.6)';
+    field.appendChild(s);
   }
+ 
+  // Occasional shooting star, crossing at a random angle/position/speed.
+  function spawnShootingStar() {
+    const star = document.createElement('span');
+    star.className = 'fx-shooting-star';
+    const startTop = Math.random() * 60;
+    const startLeft = Math.random() * 70;
+    const angle = -15 - Math.random() * 20;
+    const distance = 260 + Math.random() * 220;
+    star.style.top = startTop + 'vh';
+    star.style.left = startLeft + 'vw';
+    star.style.setProperty('--angle', angle + 'deg');
+    star.style.setProperty('--dx', distance + 'px');
+    star.style.setProperty('--dy', (distance * 0.42) + 'px');
+    star.style.animationDuration = (1 + Math.random() * 0.6).toFixed(2) + 's';
+    field.appendChild(star);
+    star.addEventListener('animationend', () => star.remove());
+  }
+ 
+  function scheduleShootingStar() {
+    const delay = 4000 + Math.random() * 7000;
+    setTimeout(() => {
+      spawnShootingStar();
+      scheduleShootingStar();
+    }, delay);
+  }
+  scheduleShootingStar();
 })();
  
 // ===== Scroll-reveal for panels, cards and tiles =====
