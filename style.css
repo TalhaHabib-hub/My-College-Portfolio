@@ -27,6 +27,7 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { animation: none !important; transition: none !important; }
+  .fx-particle { display: none; }
 }
  
 body {
@@ -44,9 +45,38 @@ a { color: inherit; text-decoration: none; }
 h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; }
  
 /* ============================================
+   AMBIENT BACKGROUND PARTICLES
+   ============================================ */
+#bg-fx {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+.fx-particle {
+  position: absolute;
+  bottom: 0;
+  border-radius: 50%;
+  filter: blur(0.4px);
+  box-shadow: 0 0 6px 1px currentColor;
+  animation-name: fxFloat;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes fxFloat {
+  from { transform: translateY(10vh) scale(0.5); opacity: 0; }
+  12%  { opacity: var(--o, 0.4); }
+  85%  { opacity: var(--o, 0.4); }
+  to   { transform: translateY(-110vh) scale(1); opacity: 0; }
+}
+ 
+/* ============================================
    PAGE GRID
    ============================================ */
 .page {
+  position: relative;
+  z-index: 1;
   max-width: 1400px;
   margin: 0 auto;
   display: grid;
@@ -291,10 +321,44 @@ h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; 
    FOOTER
    ============================================ */
 .footer {
+  position: relative;
+  z-index: 1;
   text-align: center;
   padding: 2.5rem 1.5rem 0.5rem;
   color: var(--text-dim);
   font-size: 0.8rem;
+}
+ 
+/* ============================================
+   SCROLL-REVEAL & HERO INTRO
+   ============================================ */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+[data-reveal].is-visible { opacity: 1; transform: none; }
+ 
+[data-intro-item] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+[data-intro-item].is-visible { opacity: 1; transform: none; }
+ 
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal], [data-intro-item] { opacity: 1; transform: none; transition: none; }
+}
+ 
+/* Gentle continuous drift on the hero photo, independent of the reveal above */
+.hex--drift { animation: hexDrift 6s ease-in-out infinite; }
+@keyframes hexDrift {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-10px) rotate(1.5deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hex--drift { animation: none; }
 }
  
 /* ============================================
