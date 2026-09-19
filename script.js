@@ -1,150 +1,180 @@
 
-document.getElementById('year').textContent = new Date().getFullYear();
- 
-// ===== Ambient background: starlight headliner effect =====
-// A field of fixed, independently twinkling points (like a Rolls-Royce
-// starlight roof) plus the occasional shooting star streaking across.
-// Purely decorative — skipped entirely if the visitor prefers reduced motion.
 (function () {
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduceMotion) return;
- 
-  const field = document.getElementById('bg-fx');
-  const isSmall = window.innerWidth < 640;
-  const starCount = isSmall ? 70 : 150;
- 
-  for (let i = 0; i < starCount; i++) {
-    const s = document.createElement('span');
-    s.className = 'fx-star';
-    const big = Math.random() < 0.08; // a handful of brighter "signature" stars
-    const size = big ? (2 + Math.random() * 1.4) : (0.8 + Math.random() * 1.4);
-    s.style.top = (Math.random() * 100) + 'vh';
-    s.style.left = (Math.random() * 100) + 'vw';
-    s.style.width = size.toFixed(1) + 'px';
-    s.style.height = size.toFixed(1) + 'px';
-    s.style.setProperty('--min-o', big ? '0.35' : (0.1 + Math.random() * 0.15).toFixed(2));
-    s.style.setProperty('--max-o', big ? '1' : (0.55 + Math.random() * 0.35).toFixed(2));
-    s.style.animationDuration = (2.2 + Math.random() * 4.5).toFixed(2) + 's';
-    s.style.animationDelay = (-Math.random() * 8).toFixed(2) + 's';
-    if (big) s.style.boxShadow = '0 0 4px 1px rgba(143,243,236,0.6)';
-    field.appendChild(s);
-  }
- 
-  // Occasional shooting star, crossing at a random angle/position/speed.
-  function spawnShootingStar() {
-    const star = document.createElement('span');
-    star.className = 'fx-shooting-star';
-    const startTop = Math.random() * 60;
-    const startLeft = Math.random() * 70;
-    const angle = -15 - Math.random() * 20;
-    const distance = 260 + Math.random() * 220;
-    star.style.top = startTop + 'vh';
-    star.style.left = startLeft + 'vw';
-    star.style.setProperty('--angle', angle + 'deg');
-    star.style.setProperty('--dx', distance + 'px');
-    star.style.setProperty('--dy', (distance * 0.42) + 'px');
-    star.style.animationDuration = (1 + Math.random() * 0.6).toFixed(2) + 's';
-    field.appendChild(star);
-    star.addEventListener('animationend', () => star.remove());
-  }
- 
-  function scheduleShootingStar() {
-    const delay = 4000 + Math.random() * 7000;
-    setTimeout(() => {
-      spawnShootingStar();
-      scheduleShootingStar();
-    }, delay);
-  }
-  scheduleShootingStar();
-})();
- 
-// ===== Scroll-reveal for panels, cards and tiles =====
-// Fades + lifts each [data-reveal] element in as it enters the viewport,
-// staggering siblings slightly so grids feel like they cascade in.
-(function () {
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const items = document.querySelectorAll('[data-reveal]');
- 
-  if (reduceMotion || !('IntersectionObserver' in window)) {
-    items.forEach(el => el.classList.add('is-visible'));
-    return;
-  }
- 
-  const groups = new Map();
-  items.forEach(el => {
-    const parent = el.parentElement;
-    if (!groups.has(parent)) groups.set(parent, []);
-    groups.get(parent).push(el);
-  });
-  groups.forEach(siblings => {
-    siblings.forEach((el, i) => el.style.transitionDelay = Math.min(i * 70, 350) + 'ms');
-  });
- 
-  const io = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        obs.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
- 
-  items.forEach(el => io.observe(el));
-})();
- 
-// ===== Hero entrance =====
-// A short staggered fade-up for the hero's own text lines, run once on load
-// rather than on scroll (it's already in view).
-(function () {
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const items = document.querySelectorAll('[data-intro-item]');
-  if (reduceMotion) {
-    items.forEach(el => el.classList.add('is-visible'));
-    return;
-  }
-  items.forEach((el, i) => {
-    el.style.transitionDelay = (i * 90) + 'ms';
-    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-visible')));
-  });
-})();
- 
-// ===== Contact form =====
-// Sends the form in the background via Formspree (no page reload, no backend to host).
-// Setup needed once: create a free form at https://formspree.io using
-// talhahabib8426@gmail.com, then replace YOUR_FORM_ID in the <form action="..."> in
-// index.html with the ID Formspree gives you.
-const form = document.getElementById('contactForm');
-const status = document.getElementById('cf-status');
-const submitBtn = document.getElementById('cf-submit');
- 
-if (form) {
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
-    status.textContent = '';
-    status.className = 'cf-status';
- 
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { 'Accept': 'application/json' }
-      });
-      if (response.ok) {
-        status.textContent = "Message sent — I'll get back to you soon.";
-        status.classList.add('cf-status--ok');
-        form.reset();
-      } else {
-        throw new Error('Send failed');
-      }
-    } catch (err) {
-      status.textContent = "Couldn't send — email me directly at talhahabib8426@gmail.com";
-      status.classList.add('cf-status--err');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Send Message';
+  "use strict";
+
+  /* ---------- Footer year ---------- */
+  var yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Ambient starfield ---------- */
+  var bgFx = document.getElementById('bg-fx');
+  if (bgFx && !prefersReducedMotion) {
+    var STAR_COUNT = window.innerWidth < 640 ? 55 : 110;
+    var frag = document.createDocumentFragment();
+
+    for (var i = 0; i < STAR_COUNT; i++) {
+      var star = document.createElement('span');
+      star.className = 'fx-star';
+      var size = (Math.random() * 2 + 1).toFixed(2);
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      star.style.top = (Math.random() * 100).toFixed(2) + '%';
+      star.style.left = (Math.random() * 100).toFixed(2) + '%';
+      star.style.setProperty('--min-o', (Math.random() * 0.25 + 0.1).toFixed(2));
+      star.style.setProperty('--max-o', (Math.random() * 0.5 + 0.6).toFixed(2));
+      star.style.animationDuration = (Math.random() * 3 + 2).toFixed(2) + 's';
+      star.style.animationDelay = (Math.random() * 4).toFixed(2) + 's';
+      frag.appendChild(star);
     }
+    bgFx.appendChild(frag);
+
+    function spawnShootingStar() {
+      var s = document.createElement('span');
+      s.className = 'fx-shooting-star';
+      var angle = -15 - Math.random() * 20;
+      var duration = (1.1 + Math.random() * 0.8).toFixed(2);
+
+      s.style.top = (Math.random() * 50).toFixed(2) + '%';
+      s.style.left = (Math.random() * 60).toFixed(2) + '%';
+      s.style.setProperty('--angle', angle + 'deg');
+      s.style.setProperty('--dx', (260 + Math.random() * 220).toFixed(0) + 'px');
+      s.style.setProperty('--dy', (120 + Math.random() * 140).toFixed(0) + 'px');
+      s.style.animationDuration = duration + 's';
+
+      bgFx.appendChild(s);
+      window.setTimeout(function () { s.remove(); }, duration * 1000 + 200);
+    }
+
+    (function scheduleShootingStar() {
+      var delay = 3500 + Math.random() * 5000;
+      window.setTimeout(function () {
+        spawnShootingStar();
+        scheduleShootingStar();
+      }, delay);
+    })();
+  }
+
+  /* ---------- Hero intro (staggered fade-in) ---------- */
+  document.querySelectorAll('[data-intro-item]').forEach(function (el, i) {
+    window.setTimeout(function () { el.classList.add('is-visible'); }, 120 * i + 80);
   });
-}
- 
+
+  /* ---------- Scroll reveal ---------- */
+  var revealItems = document.querySelectorAll('[data-reveal]');
+  if ('IntersectionObserver' in window && revealItems.length) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    revealItems.forEach(function (el) { revealObserver.observe(el); });
+  } else {
+    revealItems.forEach(function (el) { el.classList.add('is-visible'); });
+  }
+
+  /* ---------- Mobile nav toggle ---------- */
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+
+  if (navToggle && navLinks) {
+    navToggle.addEventListener('click', function () {
+      var isOpen = navLinks.classList.toggle('is-open');
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      navToggle.innerHTML = isOpen ? "<i class='bx bx-x'></i>" : "<i class='bx bx-menu'></i>";
+    });
+
+    navLinks.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        navLinks.classList.remove('is-open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.innerHTML = "<i class='bx bx-menu'></i>";
+      });
+    });
+  }
+
+  /* ---------- Project card cursor spotlight ---------- */
+  if (!prefersReducedMotion) {
+    document.querySelectorAll('.project-tile').forEach(function (tile) {
+      tile.addEventListener('pointermove', function (e) {
+        var rect = tile.getBoundingClientRect();
+        var x = ((e.clientX - rect.left) / rect.width) * 100;
+        var y = ((e.clientY - rect.top) / rect.height) * 100;
+        tile.style.setProperty('--mx', x + '%');
+        tile.style.setProperty('--my', y + '%');
+      });
+    });
+  }
+
+  /* ---------- Active nav link on scroll ---------- */
+  var navAnchors = document.querySelectorAll('.nav__links a');
+  var sections = [];
+  navAnchors.forEach(function (a) {
+    var id = a.getAttribute('href').replace('#', '');
+    var section = document.getElementById(id);
+    if (section) sections.push({ link: a, section: section });
+  });
+
+  if ('IntersectionObserver' in window && sections.length) {
+    var navObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var match = sections.find(function (s) { return s.section === entry.target; });
+        if (!match || !entry.isIntersecting) return;
+        navAnchors.forEach(function (a) { a.classList.remove('is-active'); });
+        match.link.classList.add('is-active');
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+
+    sections.forEach(function (s) { navObserver.observe(s.section); });
+  }
+
+  /* ---------- Contact form ---------- */
+  var form = document.getElementById('contactForm');
+  var status = document.getElementById('cf-status');
+  var submitBtn = document.getElementById('cf-submit');
+
+  if (form && status) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var action = form.getAttribute('action') || '';
+
+      if (!action || action.indexOf('YOUR_FORM_ID') !== -1) {
+        status.textContent = 'Add your Formspree form ID in the form action to enable sending.';
+        status.className = 'cf-status cf-status--err';
+        return;
+      }
+
+      status.textContent = 'Sending...';
+      status.className = 'cf-status';
+      if (submitBtn) submitBtn.disabled = true;
+
+      fetch(action, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: new FormData(form)
+      })
+        .then(function (response) {
+          if (response.ok) {
+            status.textContent = 'Thanks — your message is on its way.';
+            status.className = 'cf-status cf-status--ok';
+            form.reset();
+          } else {
+            status.textContent = 'Something went wrong — please try again.';
+            status.className = 'cf-status cf-status--err';
+          }
+        })
+        .catch(function () {
+          status.textContent = 'Network error — please try again.';
+          status.className = 'cf-status cf-status--err';
+        })
+        .finally(function () {
+          if (submitBtn) submitBtn.disabled = false;
+        });
+    });
+  }
+})();
