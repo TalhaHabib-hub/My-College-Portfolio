@@ -10,6 +10,7 @@
 <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="github-activity.css">
 </head>
 <body>
 
@@ -81,7 +82,61 @@
         <a href="#work" class="btn-pill btn-pill--outline">Read More</a>
       </div>
     </section>
+    
+    <!--
+  GITHUB ACTIVITY SECTION
+  =======================
+  Where to put this: inside <div class="col col--left">, right after the
+  closing </section> of your "panel--about" section (id="about") and before
+  the closing </div> of col--left. That's the empty gap you circled.
 
+  Also add to your <head>, near your existing style.css link:
+    <link rel="stylesheet" href="github-activity.css">
+
+  And right before your existing <script src="script.js"></script>:
+    <script src="github-activity.js"></script>
+
+  Nothing in your existing index.html / style.css / script.js needs to change.
+-->
+
+<section class="panel panel--ghactivity" id="ghactivity" data-reveal>
+  <h2 class="panel-title">GitHub <span>Activity</span></h2>
+  <p class="panel-note">Live from <a href="https://github.com/TalhaHabib-hub" target="_blank" rel="noopener">github.com/TalhaHabib-hub</a></p>
+
+  <div class="gh-stats" id="ghStats">
+    <div class="gh-stat">
+      <span class="gh-stat__value" id="ghRepos">—</span>
+      <span class="gh-stat__label">Repositories</span>
+    </div>
+    <div class="gh-stat">
+      <span class="gh-stat__value" id="ghStars">—</span>
+      <span class="gh-stat__label">Stars Earned</span>
+    </div>
+    <div class="gh-stat">
+      <span class="gh-stat__value" id="ghLangs">—</span>
+      <span class="gh-stat__label">Languages Used</span>
+    </div>
+    <div class="gh-stat">
+      <span class="gh-stat__value" id="ghFollow">—</span>
+      <span class="gh-stat__label">Followers</span>
+    </div>
+  </div>
+
+  <div class="gh-langbars" id="ghLangBars">
+    <!-- language bars injected by github-activity.js -->
+  </div>
+
+  <div class="gh-traits">
+    <span class="gh-trait"><i class='bx bx-target-lock'></i> Consistent</span>
+    <span class="gh-trait"><i class='bx bx-bolt'></i> Fast Learner</span>
+    <span class="gh-trait"><i class='bx bx-search-alt'></i> Detail-Oriented</span>
+    <span class="gh-trait"><i class='bx bx-book-reader'></i> Self-Taught</span>
+    <span class="gh-trait"><i class='bx bx-trending-up'></i> Growth-Minded</span>
+    <span class="gh-trait"><i class='bx bx-code-curly'></i> Hands-On Builder</span>
+  </div>
+
+  <p class="gh-status" id="ghStatus"></p>
+</section>
   </div>
 
   <!-- ============ RIGHT COLUMN ============ -->
@@ -222,6 +277,6 @@
 </footer>
 
 <script src="script.js"></script>
-
+<script src="github-activity.js"></script>
 </body>
 </html>

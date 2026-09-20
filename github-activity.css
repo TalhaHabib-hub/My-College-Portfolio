@@ -1,0 +1,118 @@
+/* ============================================
+   GITHUB ACTIVITY SECTION
+   Uses the same CSS variables already defined
+   in your style.css (:root) — no duplicate theme
+   needed, just load this file after style.css.
+   ============================================ */
+
+.panel--ghactivity .panel-note a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---------- Stat tiles ---------- */
+.gh-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+.gh-stat {
+  background: var(--panel-b);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  padding: 1.1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+}
+.gh-stat__value {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--accent);
+  line-height: 1;
+}
+.gh-stat__label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Language bars ---------- */
+.gh-langbars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
+}
+.gh-langbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.gh-langbar__top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.gh-langbar__name { color: var(--text); font-weight: 500; }
+.gh-langbar__track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--field);
+  overflow: hidden;
+}
+.gh-langbar__fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), rgba(47, 230, 221, 0.55));
+  transition: width 1.1s cubic-bezier(.2,.8,.3,1);
+}
+
+/* ---------- Trait chips ---------- */
+.gh-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+}
+.gh-trait {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--field);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.gh-trait i { color: var(--accent); font-size: 1rem; }
+.gh-trait:hover {
+  border-color: rgba(47, 230, 221, 0.5);
+  color: var(--text);
+  transform: translateY(-2px);
+}
+
+/* ---------- Status / error line ---------- */
+.gh-status {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 1rem;
+  min-height: 1em;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .gh-stats { grid-template-columns: repeat(2, 1fr); }
+}
