@@ -12,7 +12,7 @@
 
   if (!elRepos) return; // section not on this page
 
-  // Nice display names / colors for common languages
+  // Nice colors for common languages (falls back to accent teal if unlisted)
   var LANG_COLOR = {
     "JavaScript": "#F1E05A",
     "HTML": "#E34C26",
@@ -21,13 +21,15 @@
     "Python": "#3572A5",
     "C++": "#F34B7D",
     "TypeScript": "#3178C6",
-    "Java": "#B07219"
+    "Java": "#B07219",
+    "Blade": "#F7523F",
+    "C": "#555555",
+    "Shell": "#89E051"
   };
 
   function animateCount(el, target) {
-    var start = 0;
-    var duration = 700;
     var startTime = null;
+    var duration = 700;
     function step(ts) {
       if (!startTime) startTime = ts;
       var progress = Math.min((ts - startTime) / duration, 1);
@@ -38,16 +40,21 @@
     requestAnimationFrame(step);
   }
 
-  function renderLangBars(counts, totalRepos) {
-    var entries = Object.keys(counts)
-      .map(function (name) { return { name: name, count: counts[name] }; })
-      .sort(function (a, b) { return b.count - a.count; })
+  function renderLangBars(byteTotals) {
+    var grandTotal = Object.keys(byteTotals).reduce(function (sum, k) {
+      return sum + byteTotals[k];
+    }, 0);
+
+    var entries = Object.keys(byteTotals)
+      .map(function (name) { return { name: name, bytes: byteTotals[name] }; })
+      .sort(function (a, b) { return b.bytes - a.bytes; })
       .slice(0, 6);
 
     elBars.innerHTML = "";
 
     entries.forEach(function (entry) {
-      var pct = Math.round((entry.count / totalRepos) * 100);
+      var pct = grandTotal ? (entry.bytes / grandTotal) * 100 : 0;
+      var pctLabel = pct < 1 ? pct.toFixed(1) : Math.round(pct);
       var color = LANG_COLOR[entry.name] || "var(--accent)";
 
       var wrap = document.createElement("div");
@@ -57,7 +64,7 @@
       top.className = "gh-langbar__top";
       top.innerHTML =
         '<span class="gh-langbar__name">' + entry.name + "</span>" +
-        "<span>" + pct + "% of repos</span>";
+        "<span>" + pctLabel + "% of code</span>";
 
       var track = document.createElement("div");
       track.className = "gh-langbar__track";
@@ -73,7 +80,6 @@
       wrap.appendChild(track);
       elBars.appendChild(wrap);
 
-      // animate width after insertion
       window.setTimeout(function () { fill.style.width = pct + "%"; }, 60);
     });
   }
@@ -87,34 +93,45 @@
       fetch(reposUrl).then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
     ])
       .then(function (results) {
-        var user = results[0];
+        var user  = results[0];
         var repos = results[1];
 
         var totalStars = repos.reduce(function (sum, repo) {
           return sum + (repo.stargazers_count || 0);
         }, 0);
 
-        var langCounts = {};
-        repos.forEach(function (repo) {
-          if (repo.language) {
-            langCounts[repo.language] = (langCounts[repo.language] || 0) + 1;
-          }
+        // Fetch each repo's real language byte-counts and merge them into
+        // one grand total — this is the same method GitHub itself uses for
+        // the language bar on your profile / repo pages.
+        var langFetches = repos
+          .filter(function (repo) { return !repo.fork; }) // skip forks, they aren't your code
+          .map(function (repo) {
+            return fetch(repo.languages_url)
+              .then(function (r) { return r.ok ? r.json() : {}; })
+              .catch(function () { return {}; });
+          });
+
+        return Promise.all(langFetches).then(function (langResults) {
+          var byteTotals = {};
+          langResults.forEach(function (langs) {
+            Object.keys(langs).forEach(function (name) {
+              byteTotals[name] = (byteTotals[name] || 0) + langs[name];
+            });
+          });
+
+          animateCount(elRepos, user.public_repos || repos.length);
+          animateCount(elStars, totalStars);
+          animateCount(elLangs, Object.keys(byteTotals).length);
+          animateCount(elFollow, user.followers || 0);
+
+          renderLangBars(byteTotals);
+          elStatus.textContent = "";
         });
-        var langCount = Object.keys(langCounts).length;
-
-        animateCount(elRepos, user.public_repos || repos.length);
-        animateCount(elStars, totalStars);
-        animateCount(elLangs, langCount);
-        animateCount(elFollow, user.followers || 0);
-
-        renderLangBars(langCounts, repos.length || 1);
-
-        elStatus.textContent = "";
       })
       .catch(function () {
         // Graceful fallback if the API is rate-limited or offline —
         // keeps the section looking intentional instead of broken.
-        elRepos.textContent = "15+";
+        elRepos.textContent = "20+";
         elStars.textContent = "—";
         elLangs.textContent = "6+";
         elFollow.textContent = "—";
