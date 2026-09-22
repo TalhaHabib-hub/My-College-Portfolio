@@ -1,11 +1,11 @@
 (function () {
   "use strict";
 
-  var GH_USER = "TalhaHabib-hub"; // change this if you rename your GitHub account
+  var GH_USER = "TalhaHabib-hub";
 
-  // ---- Self-rated skill scores (0-100). Edit these yourself, GitHub has
-  // no API for "how good are you at X" — this part is honest opinion, not
-  // scraped data. ----
+  // ==============================
+  // SELF-RATED SKILLS
+  // ==============================
   var SKILLS = {
     "Frontend": 82,
     "Backend": 68,
@@ -14,7 +14,16 @@
     "Databases": 60
   };
 
-  var COVE = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"];
+  var COVE = [
+    "#2a78d6",
+    "#eb6834",
+    "#1baf7a",
+    "#eda100",
+    "#e87ba4",
+    "#008300",
+    "#6250d6",
+    "#e34948"
+  ];
 
   var LANG_COLOR = {
     "JavaScript": "#eda100",
@@ -30,228 +39,771 @@
     "Shell": "#1baf7a"
   };
 
-  var elRepos  = document.getElementById("ghRepos");
-  var elStars  = document.getElementById("ghStars");
-  var elLangs  = document.getElementById("ghLangs");
+  // ==============================
+  // ELEMENTS
+  // ==============================
+  var elRepos = document.getElementById("ghRepos");
+  var elStars = document.getElementById("ghStars");
+  var elLangs = document.getElementById("ghLangs");
   var elFollow = document.getElementById("ghFollow");
+
   var elStatus = document.getElementById("ghStatus");
   var elHeatmap = document.getElementById("ghHeatmap");
   var elHeatmapRange = document.getElementById("ghHeatmapRange");
+
   var elStackBar = document.getElementById("ghStackBar");
   var elStackBarLegend = document.getElementById("ghStackBarLegend");
   var elDonutLegend = document.getElementById("ghDonutLegend");
 
-  if (!elRepos) return; // section not on this page
+  if (!elRepos) return;
 
+
+  // ==============================
+  // ANIMATED COUNTER
+  // ==============================
   function animateCount(el, target) {
+    if (!el) return;
+
+    target = Number(target) || 0;
+
     var startTime = null;
     var duration = 700;
+
     function step(ts) {
       if (!startTime) startTime = ts;
-      var progress = Math.min((ts - startTime) / duration, 1);
+
+      var progress = Math.min(
+        (ts - startTime) / duration,
+        1
+      );
+
       el.textContent = Math.floor(progress * target);
-      if (progress < 1) requestAnimationFrame(step);
-      else el.textContent = target;
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = target;
+      }
     }
+
     requestAnimationFrame(step);
   }
 
+
+  // ==============================
+  // LANGUAGE COLORS
+  // ==============================
   function colorFor(name, index) {
     return LANG_COLOR[name] || COVE[index % COVE.length];
   }
 
+
+  // ==============================
+  // TOP LANGUAGES
+  // ==============================
   function topLanguages(byteTotals, limit) {
-    var grandTotal = Object.keys(byteTotals).reduce(function (s, k) { return s + byteTotals[k]; }, 0);
-    var sorted = Object.keys(byteTotals)
-      .map(function (name) { return { name: name, bytes: byteTotals[name] }; })
-      .sort(function (a, b) { return b.bytes - a.bytes; });
+
+    var keys = Object.keys(byteTotals);
+
+    var grandTotal = keys.reduce(function (sum, key) {
+      return sum + byteTotals[key];
+    }, 0);
+
+    var sorted = keys
+      .map(function (name) {
+        return {
+          name: name,
+          bytes: byteTotals[name]
+        };
+      })
+      .sort(function (a, b) {
+        return b.bytes - a.bytes;
+      });
 
     var top = sorted.slice(0, limit);
-    var rest = sorted.slice(limit).reduce(function (s, e) { return s + e.bytes; }, 0);
-    if (rest > 0) top.push({ name: "Other", bytes: rest });
 
-    return top.map(function (e, i) {
-      return { name: e.name, bytes: e.bytes, pct: grandTotal ? (e.bytes / grandTotal) * 100 : 0, color: e.name === "Other" ? "#5a5a5a" : colorFor(e.name, i) };
+    var rest = sorted
+      .slice(limit)
+      .reduce(function (sum, item) {
+        return sum + item.bytes;
+      }, 0);
+
+    if (rest > 0) {
+      top.push({
+        name: "Other",
+        bytes: rest
+      });
+    }
+
+    return top.map(function (entry, index) {
+
+      return {
+        name: entry.name,
+        bytes: entry.bytes,
+
+        pct: grandTotal
+          ? (entry.bytes / grandTotal) * 100
+          : 0,
+
+        color:
+          entry.name === "Other"
+            ? "#5a5a5a"
+            : colorFor(entry.name, index)
+      };
+
     });
   }
 
-  // ---------- 2. Donut ----------
+
+  // ==============================
+  // DONUT
+  // ==============================
   function renderDonut(langEntries) {
+
     var canvas = document.getElementById("ghDonut");
-    if (!canvas || !window.Chart) return;
+
+    if (!canvas || !window.Chart || !langEntries.length) {
+      return;
+    }
+
+    var oldChart = Chart.getChart(canvas);
+
+    if (oldChart) {
+      oldChart.destroy();
+    }
 
     new Chart(canvas, {
+
       type: "doughnut",
+
       data: {
-        labels: langEntries.map(function (e) { return e.name; }),
+
+        labels: langEntries.map(function (e) {
+          return e.name;
+        }),
+
         datasets: [{
-          data: langEntries.map(function (e) { return Math.round(e.pct * 10) / 10; }),
-          backgroundColor: langEntries.map(function (e) { return e.color; }),
+          data: langEntries.map(function (e) {
+            return Math.round(e.pct * 10) / 10;
+          }),
+
+          backgroundColor: langEntries.map(function (e) {
+            return e.color;
+          }),
+
           borderColor: "#10141C",
           borderWidth: 2
         }]
       },
+
       options: {
+
         responsive: true,
+
         maintainAspectRatio: false,
+
         cutout: "65%",
-        plugins: { legend: { display: false }, tooltip: { callbacks: {
-          label: function (ctx) { return ctx.label + ": " + ctx.parsed + "%"; }
-        } } }
-      }
-    });
 
-    elDonutLegend.innerHTML = langEntries.map(function (e) {
-      var pct = e.pct < 1 ? e.pct.toFixed(1) : Math.round(e.pct);
-      return '<span class="gh-donut-legend__item"><span class="gh-donut-legend__swatch" style="background:' + e.color + '"></span>' + e.name + " " + pct + "%</span>";
-    }).join("");
-  }
+        plugins: {
 
-  // ---------- 4. Stacked bar ----------
-  function renderStackBar(langEntries) {
-    elStackBar.innerHTML = langEntries.map(function (e) {
-      return '<div class="gh-stackbar__segment" style="width:' + e.pct + '%; background:' + e.color + '"></div>';
-    }).join("");
+          legend: {
+            display: false
+          },
 
-    elStackBarLegend.innerHTML = langEntries.map(function (e) {
-      var pct = e.pct < 1 ? e.pct.toFixed(1) : Math.round(e.pct);
-      return '<span class="gh-stackbar__legend-item"><span class="gh-stackbar__legend-swatch" style="background:' + e.color + '"></span>' + e.name + " " + pct + "%</span>";
-    }).join("");
-  }
+          tooltip: {
 
-  // ---------- 3. Radar (static, self-rated) ----------
-  function renderRadar() {
-    var canvas = document.getElementById("ghRadar");
-    if (!canvas || !window.Chart) return;
+            callbacks: {
 
-    var labels = Object.keys(SKILLS);
-    var data = labels.map(function (k) { return SKILLS[k]; });
+              label: function (ctx) {
 
-    new Chart(canvas, {
-      type: "radar",
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: "rgba(47, 230, 221, 0.18)",
-          borderColor: "#2FE6DD",
-          pointBackgroundColor: "#2FE6DD",
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          r: {
-            beginAtZero: true,
-            max: 100,
-            ticks: { display: false, backdropColor: "transparent" },
-            grid: { color: "rgba(255,255,255,0.08)" },
-            angleLines: { color: "rgba(255,255,255,0.08)" },
-            pointLabels: { color: "#9CA5B8", font: { size: 11 } }
+                return (
+                  ctx.label +
+                  ": " +
+                  ctx.parsed +
+                  "%"
+                );
+
+              }
+
+            }
+
           }
+
         }
+
       }
+
     });
-  }
 
-  // ---------- 1. Contribution heatmap ----------
-  function renderHeatmap(pushDates) {
-    // pushDates: array of "YYYY-MM-DD" strings, one entry per push event day
-    var counts = {};
-    pushDates.forEach(function (d) { counts[d] = (counts[d] || 0) + 1; });
 
-    var days = 90;
-    var today = new Date();
-    var cells = [];
-    for (var i = days - 1; i >= 0; i--) {
-      var d = new Date(today);
-      d.setDate(d.getDate() - i);
-      var key = d.toISOString().slice(0, 10);
-      cells.push({ date: key, count: counts[key] || 0 });
+    if (elDonutLegend) {
+
+      elDonutLegend.innerHTML =
+        langEntries.map(function (e) {
+
+          var pct =
+            e.pct < 1
+              ? e.pct.toFixed(1)
+              : Math.round(e.pct);
+
+          return (
+            '<span class="gh-donut-legend__item">' +
+              '<span class="gh-donut-legend__swatch" ' +
+              'style="background:' + e.color + '"></span>' +
+              e.name +
+              " " +
+              pct +
+              "%" +
+            "</span>"
+          );
+
+        }).join("");
+
     }
 
-    var max = Math.max.apply(null, cells.map(function (c) { return c.count; }).concat([1]));
+  }
+
+
+  // ==============================
+  // STACKED LANGUAGE BAR
+  // ==============================
+  function renderStackBar(langEntries) {
+
+    if (!elStackBar) return;
+
+    elStackBar.innerHTML =
+      langEntries.map(function (e) {
+
+        return (
+          '<div class="gh-stackbar__segment" ' +
+          'style="width:' + e.pct + '%;background:' +
+          e.color + '">' +
+          "</div>"
+        );
+
+      }).join("");
+
+
+    if (elStackBarLegend) {
+
+      elStackBarLegend.innerHTML =
+        langEntries.map(function (e) {
+
+          var pct =
+            e.pct < 1
+              ? e.pct.toFixed(1)
+              : Math.round(e.pct);
+
+          return (
+            '<span class="gh-stackbar__legend-item">' +
+              '<span class="gh-stackbar__legend-swatch" ' +
+              'style="background:' + e.color + '"></span>' +
+              e.name +
+              " " +
+              pct +
+              "%" +
+            "</span>"
+          );
+
+        }).join("");
+
+    }
+
+  }
+
+
+  // ==============================
+  // RADAR
+  // ==============================
+  function renderRadar() {
+
+    var canvas =
+      document.getElementById("ghRadar");
+
+    if (!canvas || !window.Chart) {
+      return;
+    }
+
+    var oldChart = Chart.getChart(canvas);
+
+    if (oldChart) {
+      oldChart.destroy();
+    }
+
+    var labels = Object.keys(SKILLS);
+
+    var data = labels.map(function (key) {
+      return SKILLS[key];
+    });
+
+
+    new Chart(canvas, {
+
+      type: "radar",
+
+      data: {
+
+        labels: labels,
+
+        datasets: [{
+
+          data: data,
+
+          backgroundColor:
+            "rgba(47, 230, 221, 0.18)",
+
+          borderColor:
+            "#2FE6DD",
+
+          pointBackgroundColor:
+            "#2FE6DD",
+
+          borderWidth: 2
+
+        }]
+
+      },
+
+      options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+          legend: {
+            display: false
+          }
+
+        },
+
+        scales: {
+
+          r: {
+
+            beginAtZero: true,
+
+            max: 100,
+
+            ticks: {
+              display: false
+            },
+
+            grid: {
+              color: "rgba(255,255,255,0.08)"
+            },
+
+            angleLines: {
+              color: "rgba(255,255,255,0.08)"
+            },
+
+            pointLabels: {
+
+              color: "#9CA5B8",
+
+              font: {
+                size: 11
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    });
+
+  }
+
+
+  // ==================================================
+  // REAL GITHUB CONTRIBUTION HEATMAP
+  // ==================================================
+  function renderHeatmap(contributions) {
+
+    if (!elHeatmap) return;
 
     elHeatmap.innerHTML = "";
-    cells.forEach(function (c) {
-      var level = c.count === 0 ? 0 : Math.min(4, Math.ceil((c.count / max) * 4));
-      var cell = document.createElement("div");
-      cell.className = "gh-heatmap__cell";
-      cell.setAttribute("data-level", level);
-      cell.title = c.date + ": " + c.count + " push" + (c.count === 1 ? "" : "es");
-      elHeatmap.appendChild(cell);
+
+    /*
+      GitHub contribution API returns:
+
+      {
+        date: "2026-08-10",
+        count: 5,
+        level: 3
+      }
+    */
+
+    var data = {};
+
+    contributions.forEach(function (item) {
+
+      data[item.date] = {
+        count: Number(item.count) || 0,
+        level: Number(item.level) || 0
+      };
+
     });
-  }
 
-  function loadGitHubActivity() {
-    var userUrl   = "https://api.github.com/users/" + GH_USER;
-    var reposUrl  = "https://api.github.com/users/" + GH_USER + "/repos?per_page=100";
-    var eventsUrl = "https://api.github.com/users/" + GH_USER + "/events/public?per_page=100";
 
-    Promise.all([
-      fetch(userUrl).then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); }),
-      fetch(reposUrl).then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); }),
-      fetch(eventsUrl).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
-    ])
-      .then(function (results) {
-        var user   = results[0];
-        var repos  = results[1];
-        var events = results[2];
+    // Last 90 days
+    var today = new Date();
 
-        var totalStars = repos.reduce(function (sum, repo) { return sum + (repo.stargazers_count || 0); }, 0);
+    var cells = [];
 
-        var pushDates = events
-          .filter(function (e) { return e.type === "PushEvent"; })
-          .map(function (e) { return e.created_at.slice(0, 10); });
-        renderHeatmap(pushDates);
-        elHeatmapRange.textContent = events.length
-          ? "Last ~90 days of public GitHub activity"
-          : "No recent public push events found (private repos don't show here)";
+    for (var i = 89; i >= 0; i--) {
 
-        var langFetches = repos
-          .filter(function (repo) { return !repo.fork; })
-          .map(function (repo) {
-            return fetch(repo.languages_url).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
-          });
+      var d = new Date(today);
 
-        return Promise.all(langFetches).then(function (langResults) {
-          var byteTotals = {};
-          langResults.forEach(function (langs) {
-            Object.keys(langs).forEach(function (name) {
-              byteTotals[name] = (byteTotals[name] || 0) + langs[name];
-            });
-          });
+      d.setDate(d.getDate() - i);
 
-          animateCount(elRepos, user.public_repos || repos.length);
-          animateCount(elStars, totalStars);
-          animateCount(elLangs, Object.keys(byteTotals).length);
-          animateCount(elFollow, user.followers || 0);
+      var key =
+        d.getFullYear() +
+        "-" +
+        String(d.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(d.getDate()).padStart(2, "0");
 
-          var langEntries = topLanguages(byteTotals, 6);
-          renderDonut(langEntries);
-          renderStackBar(langEntries);
-          renderRadar();
 
-          elStatus.textContent = "";
-        });
-      })
-      .catch(function () {
-        elRepos.textContent = "20+";
-        elStars.textContent = "—";
-        elLangs.textContent = "6+";
-        elFollow.textContent = "—";
-        elHeatmapRange.textContent = "Live stats temporarily unavailable";
-        renderRadar(); // radar is static, still show it
-        elStatus.textContent = "Live stats temporarily unavailable — showing recent snapshot.";
+      var item = data[key] || {
+        count: 0,
+        level: 0
+      };
+
+
+      cells.push({
+
+        date: key,
+
+        count: item.count,
+
+        level: item.level
+
       });
+
+    }
+
+
+    // Create cells
+    cells.forEach(function (item) {
+
+      var cell =
+        document.createElement("div");
+
+      cell.className =
+        "gh-heatmap__cell";
+
+      cell.setAttribute(
+        "data-level",
+        item.level
+      );
+
+      cell.title =
+        item.date +
+        ": " +
+        item.count +
+        " contribution" +
+        (item.count === 1 ? "" : "s");
+
+      elHeatmap.appendChild(cell);
+
+    });
+
+
+    elHeatmapRange.textContent =
+      "Last 90 days of GitHub contributions";
+
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadGitHubActivity);
-  } else {
-    loadGitHubActivity();
+
+  // ==================================================
+  // LOAD REAL CONTRIBUTION DATA
+  // ==================================================
+  function loadContributionHeatmap() {
+
+    var url =
+      "https://github-contributions-api.jogruber.de/v4/" +
+      GH_USER +
+      "?y=last";
+
+
+    fetch(url)
+
+      .then(function (response) {
+
+        if (!response.ok) {
+          throw new Error(
+            "Contribution API error"
+          );
+        }
+
+        return response.json();
+
+      })
+
+      .then(function (data) {
+
+        if (
+          !data ||
+          !Array.isArray(data.contributions)
+        ) {
+          throw new Error(
+            "Invalid contribution data"
+          );
+        }
+
+        renderHeatmap(
+          data.contributions
+        );
+
+      })
+
+      .catch(function (error) {
+
+        console.error(
+          "GitHub contribution error:",
+          error
+        );
+
+        elHeatmapRange.textContent =
+          "GitHub contributions temporarily unavailable";
+
+      });
+
   }
+
+
+  // ==================================================
+  // LOAD USER STATS
+  // ==================================================
+  function loadUserStats() {
+
+    var url =
+      "https://api.github.com/users/" +
+      GH_USER;
+
+
+    fetch(url)
+
+      .then(function (response) {
+
+        if (!response.ok) {
+          throw new Error(
+            "GitHub user API error"
+          );
+        }
+
+        return response.json();
+
+      })
+
+      .then(function (user) {
+
+        animateCount(
+          elRepos,
+          user.public_repos || 0
+        );
+
+        animateCount(
+          elFollow,
+          user.followers || 0
+        );
+
+      })
+
+      .catch(function (error) {
+
+        console.error(
+          "User stats error:",
+          error
+        );
+
+        elRepos.textContent = "—";
+        elFollow.textContent = "—";
+
+      });
+
+  }
+
+
+  // ==================================================
+  // LOAD REPOSITORIES + LANGUAGES
+  // ==================================================
+  function loadRepositories() {
+
+    var url =
+      "https://api.github.com/users/" +
+      GH_USER +
+      "/repos?per_page=100";
+
+
+    fetch(url)
+
+      .then(function (response) {
+
+        if (!response.ok) {
+          throw new Error(
+            "GitHub repositories API error"
+          );
+        }
+
+        return response.json();
+
+      })
+
+      .then(function (repos) {
+
+        var totalStars = repos.reduce(
+          function (sum, repo) {
+
+            return sum +
+              (repo.stargazers_count || 0);
+
+          },
+          0
+        );
+
+
+        animateCount(
+          elStars,
+          totalStars
+        );
+
+
+        var langFetches =
+          repos
+            .filter(function (repo) {
+              return !repo.fork;
+            })
+            .map(function (repo) {
+
+              return fetch(
+                repo.languages_url
+              )
+
+                .then(function (response) {
+
+                  return response.ok
+                    ? response.json()
+                    : {};
+
+                })
+
+                .catch(function () {
+                  return {};
+                });
+
+            });
+
+
+        return Promise.all(
+          langFetches
+        );
+
+      })
+
+      .then(function (langResults) {
+
+        var byteTotals = {};
+
+
+        langResults.forEach(
+          function (langs) {
+
+            Object.keys(langs).forEach(
+              function (name) {
+
+                byteTotals[name] =
+                  (byteTotals[name] || 0) +
+                  langs[name];
+
+              }
+            );
+
+          }
+        );
+
+
+        var languageCount =
+          Object.keys(byteTotals).length;
+
+
+        animateCount(
+          elLangs,
+          languageCount
+        );
+
+
+        var langEntries =
+          topLanguages(
+            byteTotals,
+            6
+          );
+
+
+        renderDonut(
+          langEntries
+        );
+
+        renderStackBar(
+          langEntries
+        );
+
+      })
+
+      .catch(function (error) {
+
+        console.error(
+          "Repository error:",
+          error
+        );
+
+        elStars.textContent = "—";
+        elLangs.textContent = "—";
+
+      });
+
+  }
+
+
+  // ==================================================
+  // START EVERYTHING INDEPENDENTLY
+  // ==================================================
+
+  function start() {
+
+    // Real contribution calendar
+    loadContributionHeatmap();
+
+    // GitHub profile stats
+    loadUserStats();
+
+    // Repositories + language graphs
+    loadRepositories();
+
+    // Static radar never depends on GitHub API
+    renderRadar();
+
+  }
+
+
+  if (
+    document.readyState === "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      start
+    );
+
+  } else {
+
+    start();
+
+  }
+
 })();
