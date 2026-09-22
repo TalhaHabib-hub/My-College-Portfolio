@@ -10,6 +10,7 @@
 <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="stylesheet" href="github-activity.css">
 <link rel="icon" type="image/png" href="favicon-64.png">
 </head>
@@ -83,7 +84,98 @@
         <a href="#work" class="btn-pill btn-pill--outline">Read More</a>
       </div>
     </section>
-    
+    <!--
+  GITHUB ACTIVITY SECTION (v2 — 4 graphs)
+  ========================================
+  Where to put this: inside <div class="col col--left">, right after the
+  closing </section> of your "panel--about" section (id="about") and before
+  the closing </div> of col--left.
+
+  Add to your <head>, near your existing style.css link:
+    <link rel="stylesheet" href="github-activity.css">
+
+  Add this BEFORE github-activity.js (Chart.js is required now):
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+  Then, right before your existing <script src="script.js"></script>:
+    <script src="github-activity.js"></script>
+
+  Nothing in your existing index.html / style.css / script.js needs to change.
+-->
+
+<section class="panel panel--ghactivity" id="ghactivity" data-reveal>
+  <h2 class="panel-title">GitHub <span>Activity</span></h2>
+  <p class="panel-note">Live from <a href="https://github.com/TalhaHabib-hub" target="_blank" rel="noopener">github.com/TalhaHabib-hub</a></p>
+
+  <div class="gh-stats" id="ghStats">
+    <div class="gh-stat">
+      <span class="gh-stat__value" id="ghRepos">—</span>
+      <span class="gh-stat__label">Repositories</span>
+    </div>
+    <div class="gh-stat">
+      <span class="gh-stat__value" id="ghStars">—</span>
+      <span class="gh-stat__label">Stars Earned</span>
+    </div>
+    <div class="gh-stat">
+      <span class="gh-stat__value" id="ghLangs">—</span>
+      <span class="gh-stat__label">Languages Used</span>
+    </div>
+    <div class="gh-stat">
+      <span class="gh-stat__value" id="ghFollow">—</span>
+      <span class="gh-stat__label">Followers</span>
+    </div>
+  </div>
+
+  <!-- 1. Contribution heatmap -->
+  <div class="gh-block">
+    <h3 class="gh-block__title">Recent activity</h3>
+    <p class="gh-block__sub" id="ghHeatmapRange">Last ~90 days of public GitHub activity</p>
+    <div class="gh-heatmap" id="ghHeatmap"></div>
+    <div class="gh-heatmap__legend">
+      <span>Less</span>
+      <span class="gh-heatmap__swatch" data-level="0"></span>
+      <span class="gh-heatmap__swatch" data-level="1"></span>
+      <span class="gh-heatmap__swatch" data-level="2"></span>
+      <span class="gh-heatmap__swatch" data-level="3"></span>
+      <span class="gh-heatmap__swatch" data-level="4"></span>
+      <span>More</span>
+    </div>
+  </div>
+
+  <!-- 2. Donut + 4. Stacked bar share a data source -->
+  <div class="gh-block gh-block--split">
+    <div class="gh-donut-wrap">
+      <h3 class="gh-block__title">Language share</h3>
+      <div class="gh-donut-row">
+        <div class="gh-donut-canvas"><canvas id="ghDonut" role="img" aria-label="Donut chart of language share across repositories"></canvas></div>
+        <div class="gh-donut-legend" id="ghDonutLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gh-block">
+    <h3 class="gh-block__title">Language mix (whole account)</h3>
+    <div class="gh-stackbar" id="ghStackBar"></div>
+    <div class="gh-stackbar__legend" id="ghStackBarLegend"></div>
+  </div>
+
+  <!-- 3. Skill radar (self-rated, edit in github-activity.js) -->
+  <div class="gh-block">
+    <h3 class="gh-block__title">Skill areas <span class="gh-block__badge">self-rated</span></h3>
+    <div class="gh-radar-canvas"><canvas id="ghRadar" role="img" aria-label="Radar chart of self-rated skill areas"></canvas></div>
+  </div>
+
+  <div class="gh-traits">
+    <span class="gh-trait"><i class='bx bx-target-lock'></i> Consistent</span>
+    <span class="gh-trait"><i class='bx bx-bolt'></i> Fast Learner</span>
+    <span class="gh-trait"><i class='bx bx-search-alt'></i> Detail-Oriented</span>
+    <span class="gh-trait"><i class='bx bx-book-reader'></i> Self-Taught</span>
+    <span class="gh-trait"><i class='bx bx-trending-up'></i> Growth-Minded</span>
+    <span class="gh-trait"><i class='bx bx-code-curly'></i> Hands-On Builder</span>
+  </div>
+
+  <p class="gh-status" id="ghStatus"></p>
+</section>
     <!--
   GITHUB ACTIVITY SECTION
   =======================
@@ -276,7 +368,7 @@
 <footer class="footer">
   <p>© <span id="year"></span> Talha Habib will work in AI.</p>
 </footer>
-
+<script src="github-activity.js"></script>
 <script src="script.js"></script>
 <script src="github-activity.js"></script>
 </body>
