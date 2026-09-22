@@ -3,9 +3,6 @@
 
   var GH_USER = "TalhaHabib-hub";
 
-  // ==============================
-  // SELF-RATED SKILLS
-  // ==============================
   var SKILLS = {
     "Frontend": 82,
     "Backend": 68,
@@ -13,17 +10,6 @@
     "Tools & Git": 75,
     "Databases": 60
   };
-
-  var COVE = [
-    "#2a78d6",
-    "#eb6834",
-    "#1baf7a",
-    "#eda100",
-    "#e87ba4",
-    "#008300",
-    "#6250d6",
-    "#e34948"
-  ];
 
   var LANG_COLOR = {
     "JavaScript": "#eda100",
@@ -39,284 +25,266 @@
     "Shell": "#1baf7a"
   };
 
-  // ==============================
-  // ELEMENTS
-  // ==============================
   var elRepos = document.getElementById("ghRepos");
   var elStars = document.getElementById("ghStars");
   var elLangs = document.getElementById("ghLangs");
   var elFollow = document.getElementById("ghFollow");
-
   var elStatus = document.getElementById("ghStatus");
   var elHeatmap = document.getElementById("ghHeatmap");
   var elHeatmapRange = document.getElementById("ghHeatmapRange");
-
   var elStackBar = document.getElementById("ghStackBar");
   var elStackBarLegend = document.getElementById("ghStackBarLegend");
   var elDonutLegend = document.getElementById("ghDonutLegend");
 
+  var donutChart = null;
+  var radarChart = null;
+
   if (!elRepos) return;
 
-
-  // ==============================
-  // ANIMATED COUNTER
-  // ==============================
   function animateCount(el, target) {
     if (!el) return;
 
     target = Number(target) || 0;
 
-    var startTime = null;
-    var duration = 700;
+    var start = 0;
+    var duration = 650;
+    var startTime = performance.now();
 
-    function step(ts) {
-      if (!startTime) startTime = ts;
-
+    function tick(now) {
       var progress = Math.min(
-        (ts - startTime) / duration,
-        1
+        1,
+        (now - startTime) / duration
       );
 
-      el.textContent = Math.floor(progress * target);
+      var eased = 1 - Math.pow(1 - progress, 3);
+
+      el.textContent = Math.round(
+        start + (target - start) * eased
+      );
 
       if (progress < 1) {
-        requestAnimationFrame(step);
-      } else {
-        el.textContent = target;
+        requestAnimationFrame(tick);
       }
     }
 
-    requestAnimationFrame(step);
+    requestAnimationFrame(tick);
   }
 
-
-  // ==============================
-  // LANGUAGE COLORS
-  // ==============================
   function colorFor(name, index) {
-    return LANG_COLOR[name] || COVE[index % COVE.length];
+    return LANG_COLOR[name] || [
+      "#2a78d6",
+      "#eb6834",
+      "#1baf7a",
+      "#eda100",
+      "#e87ba4",
+      "#008300",
+      "#6250d6",
+      "#e34948"
+    ][index % 8];
   }
 
-
-  // ==============================
-  // TOP LANGUAGES
-  // ==============================
   function topLanguages(byteTotals, limit) {
-
-    var keys = Object.keys(byteTotals);
-
-    var grandTotal = keys.reduce(function (sum, key) {
-      return sum + byteTotals[key];
-    }, 0);
-
-    var sorted = keys
+    return Object.keys(byteTotals)
       .map(function (name) {
         return {
           name: name,
-          bytes: byteTotals[name]
+          value: Number(byteTotals[name]) || 0
         };
       })
+      .filter(function (item) {
+        return item.value > 0;
+      })
       .sort(function (a, b) {
-        return b.bytes - a.bytes;
-      });
-
-    var top = sorted.slice(0, limit);
-
-    var rest = sorted
-      .slice(limit)
-      .reduce(function (sum, item) {
-        return sum + item.bytes;
-      }, 0);
-
-    if (rest > 0) {
-      top.push({
-        name: "Other",
-        bytes: rest
-      });
-    }
-
-    return top.map(function (entry, index) {
-
-      return {
-        name: entry.name,
-        bytes: entry.bytes,
-
-        pct: grandTotal
-          ? (entry.bytes / grandTotal) * 100
-          : 0,
-
-        color:
-          entry.name === "Other"
-            ? "#5a5a5a"
-            : colorFor(entry.name, index)
-      };
-
-    });
+        return b.value - a.value;
+      })
+      .slice(0, limit || 6);
   }
 
+  /* =========================
+     DONUT / PIE CHART
+     ========================= */
 
-  // ==============================
-  // DONUT
-  // ==============================
   function renderDonut(langEntries) {
-
     var canvas = document.getElementById("ghDonut");
 
-    if (!canvas || !window.Chart || !langEntries.length) {
+    if (
+      !canvas ||
+      !window.Chart ||
+      !langEntries.length
+    ) {
       return;
     }
 
-    var oldChart = Chart.getChart(canvas);
-
-    if (oldChart) {
-      oldChart.destroy();
+    if (donutChart) {
+      donutChart.destroy();
     }
 
-    new Chart(canvas, {
-
+    donutChart = new Chart(canvas, {
       type: "doughnut",
 
       data: {
-
-        labels: langEntries.map(function (e) {
-          return e.name;
+        labels: langEntries.map(function (x) {
+          return x.name;
         }),
 
-        datasets: [{
-          data: langEntries.map(function (e) {
-            return Math.round(e.pct * 10) / 10;
-          }),
+        datasets: [
+          {
+            data: langEntries.map(function (x) {
+              return x.value;
+            }),
 
-          backgroundColor: langEntries.map(function (e) {
-            return e.color;
-          }),
+            backgroundColor: langEntries.map(function (
+              x,
+              i
+            ) {
+              return colorFor(x.name, i);
+            }),
 
-          borderColor: "#10141C",
-          borderWidth: 2
-        }]
+            borderWidth: 0,
+
+            hoverOffset: 5
+          }
+        ]
       },
 
       options: {
-
         responsive: true,
 
         maintainAspectRatio: false,
 
-        cutout: "65%",
+        cutout: "66%",
 
         plugins: {
-
           legend: {
             display: false
           },
 
           tooltip: {
-
             callbacks: {
-
               label: function (ctx) {
+                var total =
+                  ctx.dataset.data.reduce(
+                    function (a, b) {
+                      return a + b;
+                    },
+                    0
+                  );
+
+                var pct = total
+                  ? Math.round(
+                      (ctx.raw / total) * 100
+                    )
+                  : 0;
 
                 return (
+                  " " +
                   ctx.label +
                   ": " +
-                  ctx.parsed +
+                  pct +
                   "%"
                 );
-
               }
-
             }
-
           }
-
         }
-
       }
-
     });
 
-
     if (elDonutLegend) {
-
       elDonutLegend.innerHTML =
-        langEntries.map(function (e) {
-
-          var pct =
-            e.pct < 1
-              ? e.pct.toFixed(1)
-              : Math.round(e.pct);
-
-          return (
-            '<span class="gh-donut-legend__item">' +
-              '<span class="gh-donut-legend__swatch" ' +
-              'style="background:' + e.color + '"></span>' +
-              e.name +
-              " " +
-              pct +
-              "%" +
-            "</span>"
-          );
-
-        }).join("");
-
+        langEntries
+          .map(function (x, i) {
+            return (
+              '<div class="gh-donut-legend__item">' +
+              '<span class="gh-donut-legend__dot" style="background:' +
+              colorFor(x.name, i) +
+              '"></span>' +
+              "<span>" +
+              x.name +
+              "</span>" +
+              "</div>"
+            );
+          })
+          .join("");
     }
-
   }
 
+  /* =========================
+     LANGUAGE MIX BAR
+     ========================= */
 
-  // ==============================
-  // STACKED LANGUAGE BAR
-  // ==============================
   function renderStackBar(langEntries) {
+    if (
+      !elStackBar ||
+      !langEntries.length
+    ) {
+      return;
+    }
 
-    if (!elStackBar) return;
+    var total = langEntries.reduce(
+      function (sum, x) {
+        return sum + x.value;
+      },
+      0
+    );
 
-    elStackBar.innerHTML =
-      langEntries.map(function (e) {
-
-        return (
-          '<div class="gh-stackbar__segment" ' +
-          'style="width:' + e.pct + '%;background:' +
-          e.color + '">' +
-          "</div>"
-        );
-
-      }).join("");
-
+    elStackBar.innerHTML = "";
 
     if (elStackBarLegend) {
-
-      elStackBarLegend.innerHTML =
-        langEntries.map(function (e) {
-
-          var pct =
-            e.pct < 1
-              ? e.pct.toFixed(1)
-              : Math.round(e.pct);
-
-          return (
-            '<span class="gh-stackbar__legend-item">' +
-              '<span class="gh-stackbar__legend-swatch" ' +
-              'style="background:' + e.color + '"></span>' +
-              e.name +
-              " " +
-              pct +
-              "%" +
-            "</span>"
-          );
-
-        }).join("");
-
+      elStackBarLegend.innerHTML = "";
     }
 
+    langEntries.forEach(function (x, i) {
+      var pct = total
+        ? (x.value / total) * 100
+        : 0;
+
+      var segment =
+        document.createElement("span");
+
+      segment.className =
+        "gh-stackbar__segment";
+
+      segment.style.width =
+        Math.max(pct, 1) + "%";
+
+      segment.style.background =
+        colorFor(x.name, i);
+
+      segment.title =
+        x.name +
+        ": " +
+        pct.toFixed(1) +
+        "%";
+
+      elStackBar.appendChild(segment);
+
+      if (elStackBarLegend) {
+        var item =
+          document.createElement("span");
+
+        item.className =
+          "gh-stackbar__legend-item";
+
+        item.innerHTML =
+          '<span class="gh-stackbar__legend-dot" style="background:' +
+          colorFor(x.name, i) +
+          '"></span>' +
+          x.name +
+          " " +
+          Math.round(pct) +
+          "%";
+
+        elStackBarLegend.appendChild(item);
+      }
+    });
   }
 
+  /* =========================
+     RADAR CHART
+     ========================= */
 
-  // ==============================
-  // RADAR
-  // ==============================
   function renderRadar() {
-
     var canvas =
       document.getElementById("ghRadar");
 
@@ -324,285 +292,220 @@
       return;
     }
 
-    var oldChart = Chart.getChart(canvas);
-
-    if (oldChart) {
-      oldChart.destroy();
+    if (radarChart) {
+      radarChart.destroy();
     }
 
-    var labels = Object.keys(SKILLS);
-
-    var data = labels.map(function (key) {
-      return SKILLS[key];
-    });
-
-
-    new Chart(canvas, {
-
+    radarChart = new Chart(canvas, {
       type: "radar",
 
       data: {
+        labels: Object.keys(SKILLS),
 
-        labels: labels,
+        datasets: [
+          {
+            data: Object.keys(SKILLS).map(
+              function (key) {
+                return SKILLS[key];
+              }
+            ),
 
-        datasets: [{
+            borderWidth: 2,
 
-          data: data,
+            pointRadius: 3,
 
-          backgroundColor:
-            "rgba(47, 230, 221, 0.18)",
+            pointHoverRadius: 5,
 
-          borderColor:
-            "#2FE6DD",
+            fill: true,
 
-          pointBackgroundColor:
-            "#2FE6DD",
+            backgroundColor:
+              "rgba(45, 220, 210, 0.14)",
 
-          borderWidth: 2
+            borderColor: "#2de0d0",
 
-        }]
-
+            pointBackgroundColor:
+              "#2de0d0"
+          }
+        ]
       },
 
       options: {
-
         responsive: true,
 
         maintainAspectRatio: false,
 
-        plugins: {
-
-          legend: {
-            display: false
-          }
-
-        },
-
         scales: {
-
           r: {
-
-            beginAtZero: true,
+            min: 0,
 
             max: 100,
 
             ticks: {
-              display: false
+              display: false,
+
+              stepSize: 20
             },
 
             grid: {
-              color: "rgba(255,255,255,0.08)"
+              color:
+                "rgba(150,170,190,.18)"
             },
 
             angleLines: {
-              color: "rgba(255,255,255,0.08)"
+              color:
+                "rgba(150,170,190,.18)"
             },
 
             pointLabels: {
-
-              color: "#9CA5B8",
+              color: "#aeb9ca",
 
               font: {
-                size: 11
+                size: 13
               }
-
             }
-
           }
+        },
 
+        plugins: {
+          legend: {
+            display: false
+          }
         }
-
       }
-
     });
-
   }
 
+  /* =========================
+     GITHUB CONTRIBUTION HEATMAP
+     ========================= */
 
-  // ==================================================
-  // REAL GITHUB CONTRIBUTION HEATMAP
-  // ==================================================
   function renderHeatmap(contributions) {
+    if (!elHeatmap) {
+      return;
+    }
 
-    if (!elHeatmap) return;
+    var cells = contributions
+      .filter(function (x) {
+        return x && x.date;
+      })
+      .slice(-91);
 
     elHeatmap.innerHTML = "";
 
-    /*
-      GitHub contribution API returns:
-
-      {
-        date: "2026-08-10",
-        count: 5,
-        level: 3
-      }
-    */
-
-    var data = {};
-
-    contributions.forEach(function (item) {
-
-      data[item.date] = {
-        count: Number(item.count) || 0,
-        level: Number(item.level) || 0
-      };
-
-    });
-
-
-    // Last 90 days
-    var today = new Date();
-
-    var cells = [];
-
-    for (var i = 89; i >= 0; i--) {
-
-      var d = new Date(today);
-
-      d.setDate(d.getDate() - i);
-
-      var key =
-        d.getFullYear() +
-        "-" +
-        String(d.getMonth() + 1).padStart(2, "0") +
-        "-" +
-        String(d.getDate()).padStart(2, "0");
-
-
-      var item = data[key] || {
-        count: 0,
-        level: 0
-      };
-
-
-      cells.push({
-
-        date: key,
-
-        count: item.count,
-
-        level: item.level
-
-      });
-
+    if (!cells.length) {
+      return;
     }
 
-
-    // Create cells
-    cells.forEach(function (item) {
-
+    cells.forEach(function (c) {
       var cell =
         document.createElement("div");
+
+      var level = Number(c.level);
+
+      if (!Number.isFinite(level)) {
+        var count =
+          Number(c.count) || 0;
+
+        level =
+          count === 0
+            ? 0
+            : Math.min(
+                4,
+                Math.ceil(count / 4)
+              );
+      }
 
       cell.className =
         "gh-heatmap__cell";
 
       cell.setAttribute(
         "data-level",
-        item.level
+        Math.max(
+          0,
+          Math.min(4, level)
+        )
       );
 
       cell.title =
-        item.date +
+        c.date +
         ": " +
-        item.count +
+        (c.count || 0) +
         " contribution" +
-        (item.count === 1 ? "" : "s");
+        ((c.count || 0) === 1
+          ? ""
+          : "s");
 
       elHeatmap.appendChild(cell);
-
     });
-
-
-    elHeatmapRange.textContent =
-      "Last 90 days of GitHub contributions";
-
   }
 
+  /* =========================
+     LOAD CONTRIBUTIONS
+     ========================= */
 
-  // ==================================================
-  // LOAD REAL CONTRIBUTION DATA
-  // ==================================================
   function loadContributionHeatmap() {
-
     var url =
       "https://github-contributions-api.jogruber.de/v4/" +
-      GH_USER +
+      encodeURIComponent(GH_USER) +
       "?y=last";
 
-
     fetch(url)
-
-      .then(function (response) {
-
-        if (!response.ok) {
+      .then(function (r) {
+        if (!r.ok) {
           throw new Error(
-            "Contribution API error"
+            "Contribution API " +
+              r.status
           );
         }
 
-        return response.json();
-
+        return r.json();
       })
 
       .then(function (data) {
+        var contributions =
+          Array.isArray(
+            data.contributions
+          )
+            ? data.contributions
+            : [];
 
-        if (
-          !data ||
-          !Array.isArray(data.contributions)
-        ) {
-          throw new Error(
-            "Invalid contribution data"
-          );
+        renderHeatmap(contributions);
+
+        if (elHeatmapRange) {
+          elHeatmapRange.textContent =
+            "Last 90 days of GitHub contributions";
         }
-
-        renderHeatmap(
-          data.contributions
-        );
-
       })
 
-      .catch(function (error) {
-
-        console.error(
-          "GitHub contribution error:",
-          error
-        );
-
-        elHeatmapRange.textContent =
-          "GitHub contributions temporarily unavailable";
-
+      .catch(function () {
+        if (elHeatmapRange) {
+          elHeatmapRange.textContent =
+            "GitHub contribution calendar temporarily unavailable";
+        }
       });
-
   }
 
+  /* =========================
+     LOAD USER STATS
+     ========================= */
 
-  // ==================================================
-  // LOAD USER STATS
-  // ==================================================
   function loadUserStats() {
-
-    var url =
+    return fetch(
       "https://api.github.com/users/" +
-      GH_USER;
+        encodeURIComponent(GH_USER)
+    )
 
-
-    fetch(url)
-
-      .then(function (response) {
-
-        if (!response.ok) {
+      .then(function (r) {
+        if (!r.ok) {
           throw new Error(
-            "GitHub user API error"
+            "User API " + r.status
           );
         }
 
-        return response.json();
-
+        return r.json();
       })
 
       .then(function (user) {
-
         animateCount(
           elRepos,
           user.public_repos || 0
@@ -613,197 +516,212 @@
           user.followers || 0
         );
 
-      })
-
-      .catch(function (error) {
-
-        console.error(
-          "User stats error:",
-          error
-        );
-
-        elRepos.textContent = "—";
-        elFollow.textContent = "—";
-
+        return user;
       });
-
   }
 
+  /* =========================
+     LOAD REPOSITORIES
+     ========================= */
 
-  // ==================================================
-  // LOAD REPOSITORIES + LANGUAGES
-  // ==================================================
   function loadRepositories() {
-
-    var url =
+    return fetch(
       "https://api.github.com/users/" +
-      GH_USER +
-      "/repos?per_page=100";
+        encodeURIComponent(GH_USER) +
+        "/repos?per_page=100&sort=updated"
+    )
 
-
-    fetch(url)
-
-      .then(function (response) {
-
-        if (!response.ok) {
+      .then(function (r) {
+        if (!r.ok) {
           throw new Error(
-            "GitHub repositories API error"
+            "Repos API " + r.status
           );
         }
 
-        return response.json();
-
+        return r.json();
       })
 
       .then(function (repos) {
-
-        var totalStars = repos.reduce(
-          function (sum, repo) {
-
-            return sum +
-              (repo.stargazers_count || 0);
-
-          },
-          0
-        );
-
+        var totalStars =
+          repos.reduce(
+            function (sum, repo) {
+              return (
+                sum +
+                (Number(
+                  repo.stargazers_count
+                ) || 0)
+              );
+            },
+            0
+          );
 
         animateCount(
           elStars,
           totalStars
         );
 
+        var ownRepos =
+          repos.filter(function (repo) {
+            return !repo.fork;
+          });
 
-        var langFetches =
-          repos
-            .filter(function (repo) {
-              return !repo.fork;
-            })
-            .map(function (repo) {
+        /*
+         * Fallback:
+         * Use repository primary languages
+         * if GitHub language endpoints fail.
+         */
 
+        var fallbackTotals = {};
+
+        ownRepos.forEach(
+          function (repo) {
+            if (repo.language) {
+              fallbackTotals[
+                repo.language
+              ] =
+                (fallbackTotals[
+                  repo.language
+                ] || 0) + 1;
+            }
+          }
+        );
+
+        var requests =
+          ownRepos.map(
+            function (repo) {
               return fetch(
                 repo.languages_url
               )
 
-                .then(function (response) {
-
-                  return response.ok
-                    ? response.json()
+                .then(function (r) {
+                  return r.ok
+                    ? r.json()
                     : {};
-
                 })
 
                 .catch(function () {
                   return {};
                 });
-
-            });
-
+            }
+          );
 
         return Promise.all(
-          langFetches
-        );
+          requests
+        ).then(
+          function (languageResults) {
+            var byteTotals = {};
 
-      })
-
-      .then(function (langResults) {
-
-        var byteTotals = {};
-
-
-        langResults.forEach(
-          function (langs) {
-
-            Object.keys(langs).forEach(
-              function (name) {
-
-                byteTotals[name] =
-                  (byteTotals[name] || 0) +
-                  langs[name];
-
+            languageResults.forEach(
+              function (languages) {
+                Object.keys(
+                  languages
+                ).forEach(
+                  function (name) {
+                    byteTotals[name] =
+                      (byteTotals[name] ||
+                        0) +
+                      Number(
+                        languages[name] ||
+                          0
+                      );
+                  }
+                );
               }
             );
 
+            /*
+             * If GitHub returned no
+             * language data, use the
+             * repository language
+             * fallback.
+             */
+
+            if (
+              !Object.keys(
+                byteTotals
+              ).length
+            ) {
+              byteTotals =
+                fallbackTotals;
+            }
+
+            var entries =
+              topLanguages(
+                byteTotals,
+                6
+              );
+
+            animateCount(
+              elLangs,
+              Object.keys(
+                byteTotals
+              ).length
+            );
+
+            /*
+             * These two functions
+             * create the missing graphs.
+             */
+
+            renderDonut(entries);
+
+            renderStackBar(entries);
           }
         );
-
-
-        var languageCount =
-          Object.keys(byteTotals).length;
-
-
-        animateCount(
-          elLangs,
-          languageCount
-        );
-
-
-        var langEntries =
-          topLanguages(
-            byteTotals,
-            6
-          );
-
-
-        renderDonut(
-          langEntries
-        );
-
-        renderStackBar(
-          langEntries
-        );
-
-      })
-
-      .catch(function (error) {
-
-        console.error(
-          "Repository error:",
-          error
-        );
-
-        elStars.textContent = "—";
-        elLangs.textContent = "—";
-
       });
-
   }
 
-
-  // ==================================================
-  // START EVERYTHING INDEPENDENTLY
-  // ==================================================
+  /* =========================
+     START EVERYTHING
+     ========================= */
 
   function start() {
 
-    // Real contribution calendar
+    /*
+     * Each API works independently.
+     * If one fails, the other graphs
+     * can still load.
+     */
+
     loadContributionHeatmap();
 
-    // GitHub profile stats
-    loadUserStats();
+    loadUserStats().catch(
+      function () {
+        if (elRepos) {
+          elRepos.textContent = "—";
+        }
 
-    // Repositories + language graphs
-    loadRepositories();
+        if (elFollow) {
+          elFollow.textContent = "—";
+        }
+      }
+    );
 
-    // Static radar never depends on GitHub API
+    loadRepositories().catch(
+      function () {
+        if (elStars) {
+          elStars.textContent = "—";
+        }
+
+        if (elLangs) {
+          elLangs.textContent = "—";
+        }
+      }
+    );
+
     renderRadar();
-
   }
 
-
   if (
-    document.readyState === "loading"
+    document.readyState ===
+    "loading"
   ) {
-
     document.addEventListener(
       "DOMContentLoaded",
       start
     );
-
   } else {
-
     start();
-
   }
 
 })();
