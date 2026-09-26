@@ -1,4 +1,4 @@
-# My College Portfolio
+# My Portfolio
 
 A personal portfolio website built with plain HTML, CSS, and JavaScript — no frameworks, no AI-generated code. Live at **[my-college-portfolio-nu.vercel.app](https://my-college-portfolio-nu.vercel.app)**.
 
@@ -31,15 +31,16 @@ This is Talha Habib's personal portfolio, showcasing projects, skills, and live 
 ## Project Structure
 
 ```
-My-College-Portfolio/
-├── index.html            # Main page markup
-├── style.css              # Core styles
-├── script.js               # Scroll-reveal, nav toggle, form handling, etc.
-├── github-activity.js       # Fetches and renders live GitHub stats
-├── github-activity.css       # Styles for the GitHub activity section
-├── favicon.png
-├── favicon-64.png
-└── t1.png
+Portfolio/
+├── index.html                     # Main page markup
+├── style.css                      # Core styles
+├── script.js                      # Scroll-reveal, nav toggle, form handling, etc.
+├── github-activity.js             # Fetches and renders live GitHub stats
+├── github-activity.css            # Styles for the GitHub activity section
+├── github-activity-chart-fix.css  # Layout/rendering fixes for the activity chart
+├── favicon-64.png                 # Site favicon
+├── t1.png                         # Hero/profile image
+└── Talha-Habib-CV.pdf             # Downloadable CV/resume
 ```
 
 ## Running Locally
@@ -48,8 +49,8 @@ No build step is required — it's static HTML/CSS/JS.
 
 1. Clone the repo
    ```bash
-   git clone https://github.com/TalhaHabib-hub/My-College-Portfolio.git
-   cd My-College-Portfolio
+   git clone https://github.com/TalhaHabib-hub/Portfolio.git
+   cd Portfolio
    ```
 2. Open `index.html` in your browser, or serve it locally:
    ```bash
@@ -58,7 +59,7 @@ No build step is required — it's static HTML/CSS/JS.
 
 ## Setup Notes
 
-- The contact form posts to Formspree — replace `YOUR_FORM_ID` in `index.html` with your own [Formspree](https://formspree.io) endpoint to make it functional.
+- The contact form already posts to a live [Formspree](https://formspree.io) endpoint configured in `index.html` — if you fork this, swap in your own Formspree form ID to make it functional for you.
 - The GitHub Activity section fetches data live from the GitHub API for the `TalhaHabib-hub` account — update the username in `github-activity.js` if you fork this for your own use.
 
 ## Deployment
